@@ -1,5 +1,11 @@
-// Package ukrpost implements post tracking for http://ukrposhta.ua/
+// Package ukrpost implements post tracking and index search for http://ukrposhta.ua/
 package ukrpost
+
+import (
+	"encoding/xml"
+	"net/http"
+	"net/url"
+)
 
 const (
 	baseUrl = `http://services.ukrposhta.com`
@@ -19,4 +25,14 @@ func New(guid string) *Service {
 		guid = defGuid
 	}
 	return &Service{Guid: guid, Lang: "en"}
+}
+
+// callAPI invokes ukrpost api method on a specific endpoint
+func (s *Service) callAPI(endpoint, meth string, args url.Values, out interface{}) error {
+	resp, err := http.Get(baseUrl + endpoint + "/" + meth + "?" + args.Encode())
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+	return xml.NewDecoder(resp.Body).Decode(out)
 }

@@ -1,8 +1,6 @@
 package ukrpost
 
 import (
-	"encoding/xml"
-	"net/http"
 	"net/url"
 	"strings"
 )
@@ -11,12 +9,7 @@ const trackEndpoint = `/barcodestatistic/barcodestatistic.asmx`
 
 // CallTrackAPI invokes ukrpost track api method
 func (s *Service) CallTrackAPI(meth string, args url.Values, out interface{}) error {
-	resp, err := http.Get(baseUrl + trackEndpoint + "/" + meth + "?" + args.Encode())
-	if err != nil {
-		return err
-	}
-	defer resp.Body.Close()
-	return xml.NewDecoder(resp.Body).Decode(out)
+	return s.callAPI(trackEndpoint, meth, args, out)
 }
 
 type TrackInfo struct {
@@ -30,10 +23,14 @@ type TrackInfo struct {
 
 // Track returns delivery status of postal item with the given barcode
 func (s *Service) Track(barcode string) (TrackInfo, error) {
+	lang := s.Lang
+	if lang == "ua" {
+		lang = "uk"
+	}
 	vals := url.Values{
 		"guid":    {s.Guid},
 		"barcode": {barcode},
-		"culture": {s.Lang},
+		"culture": {lang},
 	}
 	var status TrackInfo
 	if err := s.CallTrackAPI(`GetBarcodeInfo`, vals, &status); err != nil {

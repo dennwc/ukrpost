@@ -1,9 +1,7 @@
 package ukrpost
 
 import (
-	"encoding/xml"
 	"fmt"
-	"net/http"
 	"net/url"
 	"strings"
 )
@@ -12,12 +10,7 @@ const indexEndpoint = `/ServIndexnp/servindexnp.asmx`
 
 // CallIndexAPI invokes ukrpost index api method
 func (s *Service) CallIndexAPI(meth string, args url.Values, out interface{}) error {
-	resp, err := http.Get(baseUrl + indexEndpoint + "/" + meth + "?" + args.Encode())
-	if err != nil {
-		return err
-	}
-	defer resp.Body.Close()
-	return xml.NewDecoder(resp.Body).Decode(out)
+	return s.callAPI(indexEndpoint, meth, args, out)
 }
 
 // Office represents a post office
