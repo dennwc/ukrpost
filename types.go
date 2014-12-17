@@ -33,7 +33,7 @@ func (d *Date) UnmarshalXML(dec *xml.Decoder, start xml.StartElement) error {
 type Int int
 
 func (d Int) String() string {
-	return fmt.Sprint(d)
+	return fmt.Sprint(int(d))
 }
 func (d Int) MarshalXML(enc *xml.Encoder, start xml.StartElement) error {
 	return enc.EncodeToken(xml.CharData([]byte(d.String())))
